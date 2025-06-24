@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Recipe Vault</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav {
+      background-color: #333;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+    }
+
+    nav h2 {
+      margin: 0;
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-left: 1rem;
+    }
+
+    section {
+      padding: 2rem;
+    }
+
+    .home {
+      text-align: center;
+    }
+
+    .search-box {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    input[type="text"] {
+      width: 300px;
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+
+    button.search-btn {
+      padding: 0.5rem 1rem;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .recipe-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    .recipe-card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .recipe-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+
+    .recipe-card h3 {
+      margin: 0.5rem 0;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <h2>🍲 Recipe Vault</h2>
+  <div>
+    <button onclick="showSection('home')">Home</button>
+    <button onclick="showSection('vault')">Vault</button>
+  </div>
+</nav>
+
+<!-- Home Section -->
+<section id="homeSection" class="home">
+  <h1>Welcome to Recipe Vault</h1>
+  <p>This is a simple web application where you can search for recipes from an open API and save them to your personal vault.</p>
+  <p>No account needed. Just search, discover, and click "Add to Vault" to simulate saving your favorites.</p>
+  <p>Built for learning, testing, and demonstration — no business logic or user tracking.</p>
+</section>
+
+<!-- Vault/Search Section -->
+<section id="vaultSection" style="display: none;">
+  <h1>Find Recipes</h1>
+
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search for a recipe...">
+    <button class="search-btn" onclick="searchRecipes()">Search</button>
+  </div>
+
+  <div id="results" class="recipe-list"></div>
+</section>
+
+<script>
+  function showSection(section) {
+    document.getElementById('homeSection').style.display = (section === 'home') ? 'block' : 'none';
+    document.getElementById('vaultSection').style.display = (section === 'vault') ? 'block' : 'none';
+  }
+
+  function searchRecipes() {
+    const query = document.getElementById('searchInput').value.trim();
+    const results = document.getElementById('results');
+    results.innerHTML = '';
+
+    if (!query) {
+      alert("Enter a recipe name to search.");
+      return;
+    }
+
+    fetch(`http://localhost:8000/api/search?q=${encodeURIComponent(query)}`)
+      .then(response => response.json())
+      .then(data => {
+        if (!data.meals) {
+          results.innerHTML = '<p>No recipes found.</p>';
+          return;
+        }
+
+        data.meals.forEach(meal => {
+          const card = document.createElement('div');
+          card.className = 'recipe-card';
+
+          card.innerHTML = `
+            <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+            <h3>${meal.strMeal}</h3>
+            <button onclick='addToVault(${JSON.stringify(meal)})'>Add to Vault</button>
+          `;
+
+          results.appendChild(card);
+        });
+      })
+      .catch(error => {
+        console.error("Error fetching recipes:", error);
+        alert("Something went wrong. Try again later.");
+      });
+  }
+
+  function addToVault(meal) {
+    console.log("Adding to vault:", meal);
+    alert(`"${meal.strMeal}" added to the vault (simulated).`);
+  }
+</script>
+
+</body>
+</html>
