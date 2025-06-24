@@ -10,3 +10,7 @@ This an application I built with zero  business value
 ### Tech stack
  - Golang
  - HTML,CSS,JavaScript
+ - Postgres
+
+
+ - **TODO : Frontend Work in progress**
